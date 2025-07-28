@@ -4,14 +4,41 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
-const { connectDB } = require('./config/database'); // Import connectDB from the new database.js
-// --- IMPORTANT: Import your models here so Sequelize can find them ---
-// This import makes Sequelize aware of the Shipment model
-require('./models/Shipment'); // Just require it, no need to assign to a variable here if not used directly
-// This import is necessary to ensure the model is registered with Sequelize
+const { connectDB } = require('./config/database');
 
-// Call the database connection function
-connectDB();
+// Import your models here so Sequelize can find them and sync
+require('./models/Shipment');
+require('./models/User'); // Add this line for the User model
+
+// Import your routes here
+const trackingRoutes = require('./routes/trackingRoutes');
+const quoteRoutes = require('./routes/quoteRoutes');
+const adminRoutes = require('./routes/adminRoutes');// Add this line for admin routes
+const authRoutes = require('./routes/authRoutes'); // Add this line for auth routes
+
+// Call the database connection function, which also syncs models
+connectDB().then(async () => {
+  // You can add a block here to create an initial admin user if none exists
+  // FOR INITIAL SETUP ONLY:
+  // const User = require('./models/User');
+  // const bcrypt = require('bcryptjs');
+  // try {
+  //   const adminExists = await User.findOne({ where: { username: 'admin' } });
+  //   if (!adminExists) {
+  //     const salt = await bcrypt.genSalt(10);
+  //     const hashedPassword = await bcrypt.hash('adminpassword', salt); // Choose a strong password!
+  //     await User.create({
+  //       username: 'admin',
+  //       email: 'admin@iqexpress.com',
+  //       password: hashedPassword,
+  //       role: 'admin'
+  //     });
+  //     console.log('Initial admin user created!');
+  //   }
+  // } catch (err) {
+  //   console.error('Error creating initial admin user:', err);
+  // }
+});
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +51,13 @@ app.use(express.json());
 app.get('/', (req, res) => {
   res.send('iQexpress Backend API is running!');
 });
+
+// Mount your API routes
+app.use('/api/track', trackingRoutes);
+app.use('/api/quote', quoteRoutes);
+app.use('/api/admin/shipments', adminRoutes);
+app.use('/api/auth', authRoutes); // Add this new line for authentication routes
+
 
 // Start the server
 app.listen(PORT, () => {
