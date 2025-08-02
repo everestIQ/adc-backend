@@ -18,6 +18,7 @@ const adminRoutes = require('./routes/adminRoutes');// Add this line for admin r
 const authRoutes = require('./routes/authRoutes'); // Add this line for auth routes
 
 // Call the database connection function, which also syncs models
+// This will ensure that the database is connected before starting the server
 connectDB().then(async () => {
   // You can add a block here to create an initial admin user if none exists
   // FOR INITIAL SETUP ONLY:
