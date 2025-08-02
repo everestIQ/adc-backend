@@ -1,4 +1,5 @@
 // iqexpress-backend/server.js
+// This file sets up the Express server and connects to the database.
 
 require('dotenv').config();
 
